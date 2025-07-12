@@ -1,0 +1,7 @@
+# Log Files
+*.log
+
+# Tooling directories
+.dvt/*
+
+
