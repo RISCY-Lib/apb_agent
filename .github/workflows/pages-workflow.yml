@@ -1,0 +1,56 @@
+name: Page Workflow
+
+permissions:
+  id-token: write
+  pages: write
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prereqs
+        run : |
+          cd ..
+          sudo apt-get update
+          sudo apt install ca-certificates gnupg
+          sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+          echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+          sudo apt update
+          sudo apt-get install -y git curl unzip mono-devel
+          curl -o nd.zip https://www.naturaldocs.org/download/natural_docs/2.3.1/Natural_Docs_2.3.1.zip
+          unzip nd.zip
+          ls
+
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Run Natural-Docs
+        run: |
+          ls
+          ls ../Natural\ Docs
+          mono ../Natural\ Docs/NaturalDocs.exe docs/config
+          ls docs
+
+      - name: Upload static files as artifacts
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/html/
+
+  deploy-pages:
+    environment:
+      name: github-pags
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build-pages
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
