@@ -4,4 +4,6 @@
 # Tooling directories
 .dvt/*
 
-
+# Documentation Build Files
+docs/html
+docs/config/Working\ Data/
