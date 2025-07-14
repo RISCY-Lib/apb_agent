@@ -6,10 +6,10 @@
 # Project Information
 # ------------------------------------------------------------------------
 
-Title: PADC Common Cells
-Subtitle: A collection of technology agnostic cells and common IP
+Title: RISCY-Lib APB Agent
+Subtitle: A UVM APB Agent which supports Completers and Requesters
 
-Copyright: © 2025 Texas Instruments, Inc
+Copyright: © 2025 RISCY-Lib Contributors
 
 
 # This is where you put general information about your project.  None of these
@@ -73,6 +73,9 @@ Copyright: © 2025 Texas Instruments, Inc
 
 Source Folder: ../../src
    Name: source
+
+Source Folder 2: ../../include
+   Name: include
 
 
 # This is where you tell Natural Docs which folders it should scan for source

@@ -22,7 +22,7 @@ typedef enum {
     APB_REQUESTER_AGENT
 } apb_agent_mode_e;
 
-// Struct: apb_pprot_t
+// Struct: apb_agent_pkg.apb_pprot_t
 typedef struct packed {
     logic privileged;
     logic insecure;

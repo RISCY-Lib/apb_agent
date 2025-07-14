@@ -21,6 +21,8 @@
 
 Alter Language: SystemVerilog
 
+   Interface Prototype Ender: ;
+   Property Prototype Ender: ;
    Signals Prototype Enders: ; =
    Instances Prototype Ender: ;
 

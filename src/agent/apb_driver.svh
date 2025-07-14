@@ -85,7 +85,7 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
         super.run_phase(phase);
 
         if (m_cfg.agent_mode == APB_COMPLETER_AGENT) begin
-            completer_run_phase(phase);
+            completer_run_phase();
         end
         // else if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
         //     requester_run_phase(phase);
@@ -103,7 +103,7 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
 
     // Task: completer_run_phase
     // The UVM Run-Phase for a completer agent
-    virtual task completer_run_phase(uvm_phase phase);
+    virtual task completer_run_phase();
         apb_transaction#(`_APB_AGENT_PARAM_MAP) trans;  // The transaction in the address phase
         apb_phase_e phase;
 
@@ -113,8 +113,8 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
         m_vif.paddr     = '0;
         m_vif.pprot     = '0;
         m_vif.pwdata    = '0;
-        m_vif.pstrb    = '1;
-        m_vif.write    = 1'b0;
+        m_vif.pstrb     = '1;
+        m_vif.pwrite    = APB_READ;
 
         m_vif.psel      = 1'b0;
         m_vif.penable   = 1'b0;
@@ -135,14 +135,11 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
                 m_vif.psel = 1'b1;
                 m_vif.paddr = trans.addr;
                 m_vif.pprot = trans.pprot;
+                m_vif.pwrite = trans.write;
 
                 if (trans.write == APB_WRITE) begin
-                    m_vif.write = 1'b1;
                     m_vif.pwdata = trans.data;
                     m_vif.pstrb = trans.wstrb;
-                end
-                else begin
-                    m_vif.write = 1'b0;
                 end
 
                 phase = APB_ACCESS_PHASE;

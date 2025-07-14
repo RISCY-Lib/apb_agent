@@ -96,7 +96,7 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
         forever begin
             @(posedge m_vif.pclk);
 
-            if (!m_vif.hreset_n) begin
+            if (!m_vif.preset_n) begin
                 trans = null;
                 continue;
             end

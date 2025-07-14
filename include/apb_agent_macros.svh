@@ -19,6 +19,8 @@
 `ifndef __APB_AGENT_MACROS__SVH__
 `define __APB_AGENT_MACROS__SVH__
 
+// Macro: _APB_AGENT_PARAM_DEFS
+// Macro for instantiating the common parameters used around the agent
 `define _APB_AGENT_PARAM_DEFS \
     parameter int ADDR_WIDTH = 32,  \
     parameter int DATA_WIDTH = 32

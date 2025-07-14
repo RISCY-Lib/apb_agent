@@ -41,7 +41,7 @@ class apb_agent_config extends uvm_object;
 
     // Reference: vif_handle
     // The uvm_config_db 'field_name' handle to the virtual interface
-    string vif_handle="m_vif";
+    string vif_handle = "m_vif";
 
     // Group: Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////

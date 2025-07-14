@@ -17,6 +17,7 @@
  ************************************************************************************/
 
 // Package: apb_agent_pkg
+// Package which contains the apb_agent an relevant definitions
 package apb_agent_pkg;
 
     // UVM Imports
