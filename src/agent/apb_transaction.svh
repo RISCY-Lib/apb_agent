@@ -28,8 +28,7 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
     // Property: rand_type
     // The agent mode to use when randomizing.
     // Only randomizes values which should be set by a sequence
-    // Note: rand_type = APB_DECODER_AGENT causes all values to be randomized
-    apb_agent_mode_e rand_type = APB_DECODER_AGENT;
+    apb_agent_mode_e rand_type = APB_COMPLETER_AGENT;
 
     // Property: write
     // Whether the transaction is read or write
@@ -73,13 +72,11 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
     function void pre_randomize();
         super.pre_randomize();
 
-        if (rand_type == APB_DECODER_AGENT) begin
-            return;
-        end
         if (rand_type == APB_COMPLETER_AGENT) begin
             wait_states.rand_mode(0);
             return;
         end
+
         if (rand_type == APB_REQUESTER_AGENT) begin
             write.rand_mode(0);
             addr.rand_mode(0);

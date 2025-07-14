@@ -19,7 +19,9 @@
 `include "apb_agent_macros.svh"
 
 // Interface: apb_vip_if
-interface apb_vip_if #(
+interface apb_vip_if
+    import apb_agent_pkg::*;
+#(
     `_APB_AGENT_PARAM_DEFS
 )(
     input logic preset_n,
@@ -35,7 +37,7 @@ interface apb_vip_if #(
     apb_pprot_t                pprot;
     logic                      psel;
     logic                      penable;
-    apb_write_t                pwrite;
+    apb_write_e                pwrite;
     logic [    DATA_WIDTH-1:0] pwdata;
     logic [   _STRB_WIDTH-1:0] pstrb;
 
