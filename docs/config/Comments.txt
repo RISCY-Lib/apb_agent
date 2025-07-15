@@ -28,17 +28,6 @@ Alter Comment Type: Class
       package, packages
 
 
-Comment Type: SVInterface
-
-   Display Name: Interface
-   Plural Display Name: Interfaces
-
-   Scope: Start
-
-   SystemVerilog Keywords:
-      svinterface, svinterfaces
-
-
 Comment Type: Signals
 
    Display Name: Signal
