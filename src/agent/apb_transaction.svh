@@ -58,6 +58,12 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
     // Set by the agent in APB_REQUESTER_AGENT mode.
     rand apb_pprot_t pprot = '0;
 
+    // Poperty: error
+    // The Completer Error signal from the transaction.
+    // Set by the sequence in APB_REQUESTER_AGENT mode.
+    // set by the agent in AAPB_COMPELTER_AGENT mode.
+    rand bit error = 1'b0;
+
     // Property: wait_states
     // The number of wait states in the transaction.
     // Set by sequence in APB_REQUESTER_AGENT mode.
@@ -73,6 +79,7 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
         super.pre_randomize();
 
         if (rand_type == APB_COMPLETER_AGENT) begin
+            error.rand_mode(0);
             wait_states.rand_mode(0);
             return;
         end

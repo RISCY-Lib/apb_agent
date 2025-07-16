@@ -137,13 +137,15 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
             // Access Phase
             // TODO: Check penable
 
-            if (m_vif.pready) begin
+            if (m_vif.pready && m_vif.penable) begin
                 if (trans.write == APB_READ) begin
                     trans.data = m_vif.prdata;
                 end
                 else begin
                     trans.data = m_vif.pwdata;
                 end
+
+                trans.error = m_vif.pslverr;
 
                 ap.write(trans);
                 trans = null;

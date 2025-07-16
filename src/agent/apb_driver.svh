@@ -181,6 +181,7 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
 
         m_vif.pready = 1'b0;
         m_vif.prdata = '0;
+        m_vif.pslverr = 1'b0;
 
         forever begin
             m_vif.pready = 1'b0;
@@ -197,6 +198,7 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
             end
 
             m_vif.pready = 1'b1;
+            m_vif.pslverr = trans.error;
 
             @(posedge m_vif.pclk);
             seq_item_port.item_done();
