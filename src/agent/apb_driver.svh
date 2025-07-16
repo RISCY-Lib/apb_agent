@@ -87,9 +87,9 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
         if (m_cfg.agent_mode == APB_COMPLETER_AGENT) begin
             completer_run_phase();
         end
-        // else if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
-        //     requester_run_phase(phase);
-        // end
+        else if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
+            requester_run_phase();
+        end
         else begin
             `uvm_error(
                 get_type_name(),
@@ -125,14 +125,26 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
             if (!m_vif.preset_n)
                 continue;
 
-            if (trans == null)
+            // First check if the previous transaction is done
+            if (m_vif.pready && phase == APB_ACCESS_PHASE && trans != null) begin
+                if (trans.write == APB_READ) begin
+                    trans.data = m_vif.prdata;
+                end
+
+                `uvm_info(get_type_name(), "Finished transaction", UVM_HIGH)
+                seq_item_port.item_done();
+
+                trans = null;
+                phase = APB_SETUP_PHASE;
+            end
+
+            // Check if a new transaction is ready
+            if (trans == null) begin
                 seq_item_port.try_next_item(trans);
+            end
 
-            if (trans == null)
-                continue;
-
-            if (phase == APB_SETUP_PHASE) begin
-                m_vif.psel = 1'b1;
+            // Drive setup-phase signals if applicable
+            if (trans != null && phase == APB_SETUP_PHASE) begin
                 m_vif.paddr = trans.addr;
                 m_vif.pprot = trans.pprot;
                 m_vif.pwrite = trans.write;
@@ -141,33 +153,54 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
                     m_vif.pwdata = trans.data;
                     m_vif.pstrb = trans.wstrb;
                 end
+            end
 
+            // Set psel and penable based on the transaction stage
+            if (trans == null) begin
+                m_vif.psel = 1'b0;
+                m_vif.penable = 1'b0;
+            end
+            else if (phase == APB_SETUP_PHASE) begin
+                m_vif.psel = 1'b1;
+                m_vif.penable = 1'b0;
                 phase = APB_ACCESS_PHASE;
             end
             else begin
-                if (m_vif.pready) begin
-                    if (trans.write == APB_READ) begin
-                        trans.data = m_vif.prdata;
-                    end
-
-                    m_vif.psel = 1'b0;
-                    m_vif.penable = 1'b0;
-                    seq_item_port.item_done();
-                    phase = APB_SETUP_PHASE;
-                end
-                else begin
-                    m_vif.penable = 1'b1;
-                end
+                m_vif.psel = 1'b1;
+                m_vif.penable = 1'b1;
             end
-
         end
     endtask : completer_run_phase
 
 
     // Task: requester_run_phase
     // The UVM Run-Phase for a requester agent
-    virtual task requester_run_phase(uvm_phase phase);
+    virtual task requester_run_phase();
+        apb_transaction#(`_APB_AGENT_PARAM_MAP) trans;
+        int wait_states;
 
+        m_vif.pready = 1'b0;
+        m_vif.prdata = '0;
+
+        forever begin
+            m_vif.pready = 1'b0;
+
+            // Get the reaction
+            seq_item_port.get_next_item(trans);
+
+            repeat(trans.wait_states) begin
+                @(posedge m_vif.pclk);
+            end
+
+            if (trans.write == APB_READ) begin
+                m_vif.prdata = trans.data;
+            end
+
+            m_vif.pready = 1'b1;
+
+            @(posedge m_vif.pclk);
+            seq_item_port.item_done();
+        end
     endtask : requester_run_phase
 
 endclass

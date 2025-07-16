@@ -16,31 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ************************************************************************************/
 
-// Package: apb_agent_pkg
-// Package which contains the apb_agent an relevant definitions
-package apb_agent_pkg;
+package apb_tb_example_pkg;
 
-    // UVM Imports
     import uvm_pkg::*;
     `include "uvm_macros.svh"
 
-    // General Includes
-    `include "apb_agent_macros.svh"
+    import apb_agent_pkg::*;
 
-    `include "apb_definitions.svh"
+    `include "uvm_src/apb_env_example.svh"
+    `include "uvm_src/apb_seq.svh"
+    `include "uvm_src/apb_test.svh"
 
-    // Agent Includes
-    `include "agent/apb_agent_config.svh"
-    `include "agent/apb_transaction.svh"
-
-    `include "agent/apb_sequencer.svh"
-    `include "agent/apb_monitor.svh"
-    `include "agent/apb_driver.svh"
-    `include "agent/apb_cov.svh"
-    `include "agent/apb_agent.svh"
-
-    `include "seqs/apb_requester_reactive_seq.svh"
-    `include "seqs/apb_requester_no_wait_states_seq.svh"
-    `include "seqs/apb_requester_wait_states_seq.svh"
-
-endpackage : apb_agent_pkg
+endpackage

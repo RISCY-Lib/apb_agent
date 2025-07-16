@@ -16,31 +16,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  ************************************************************************************/
 
-// Package: apb_agent_pkg
-// Package which contains the apb_agent an relevant definitions
-package apb_agent_pkg;
-
-    // UVM Imports
+module tb();
     import uvm_pkg::*;
     `include "uvm_macros.svh"
 
-    // General Includes
-    `include "apb_agent_macros.svh"
+    import apb_tb_example_pkg::*;
 
-    `include "apb_definitions.svh"
+    logic pclk;
+    logic presetn;
 
-    // Agent Includes
-    `include "agent/apb_agent_config.svh"
-    `include "agent/apb_transaction.svh"
+    `APB_IF_INST(32, 32, APB, pclk, presetn)
 
-    `include "agent/apb_sequencer.svh"
-    `include "agent/apb_monitor.svh"
-    `include "agent/apb_driver.svh"
-    `include "agent/apb_cov.svh"
-    `include "agent/apb_agent.svh"
+    initial begin
+        pclk = 1'b0;
+        forever begin
+            #10ns;
+            pclk = ~pclk;
+        end
+    end
 
-    `include "seqs/apb_requester_reactive_seq.svh"
-    `include "seqs/apb_requester_no_wait_states_seq.svh"
-    `include "seqs/apb_requester_wait_states_seq.svh"
+    initial begin
+        presetn = 1'b0;
 
-endpackage : apb_agent_pkg
+        repeat(3) begin
+            @(posedge pclk);
+        end
+
+        presetn = 1'b1;
+    end
+
+    initial begin
+        run_test();
+    end
+endmodule : tb

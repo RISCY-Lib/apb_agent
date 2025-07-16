@@ -40,7 +40,7 @@ class apb_agent #(
 
     // Property: m_sequencer
     // The UVM Sequencer for the APB Agent
-    uvm_sequencer#(apb_transaction#(`_APB_AGENT_PARAM_MAP)) m_sequencer;
+    apb_sequencer#(`_APB_AGENT_PARAM_MAP) m_sequencer;
 
     // Property: m_driver
     // The UVM Driver for the APB Agent
@@ -95,8 +95,7 @@ class apb_agent #(
             m_driver = apb_driver#(`_APB_AGENT_PARAM_MAP)::type_id::create("m_driver", this);
             m_driver.m_cfg = m_cfg;
 
-            m_sequencer = uvm_sequencer#(apb_transaction#(`_APB_AGENT_PARAM_MAP))::
-                            type_id::create("m_sequencer", this);
+            m_sequencer = apb_sequencer#(`_APB_AGENT_PARAM_MAP)::type_id::create("m_sequencer", this);
         end
 
         // Build the coverage if there is functional coverage
@@ -123,6 +122,10 @@ class apb_agent #(
         // Connect driver and sequencer if the agent is active
         if (m_cfg.is_active == UVM_ACTIVE) begin
             m_driver.seq_item_port.connect(m_sequencer.seq_item_export);
+
+            if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
+                m_monitor.req_ap.connect(m_sequencer.request_export);
+            end
         end
 
         // Connect the coverage collector if there is functional coverage

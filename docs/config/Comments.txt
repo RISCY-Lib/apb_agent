@@ -28,6 +28,11 @@ Alter Comment Type: Class
       package, packages
 
 
+Alter Comment Type: Function
+   SystemVerilog Keywords:
+      task, tasks
+
+
 Comment Type: Signals
 
    Display Name: Signal

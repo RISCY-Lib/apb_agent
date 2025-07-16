@@ -33,6 +33,10 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
     // The analysis port which this monitor uses to export to
     uvm_analysis_port #(apb_transaction#(`_APB_AGENT_PARAM_MAP)) ap;
 
+    // Property: req_ap
+    // The analysis port which sends request transactions to be used by reactive agent sequences
+    uvm_analysis_port #(apb_transaction#(`_APB_AGENT_PARAM_MAP)) req_ap;
+
     // Reference: m_cfg
     // The agent config for this APB agent
     apb_agent_config m_cfg;
@@ -59,6 +63,7 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
         super.build_phase(phase);
 
         ap = new("ap", this);
+        req_ap = new("req_ap", this);
 
         if (m_cfg == null) begin
             if (!uvm_config_db#(apb_agent_config)::get(this, "", "m_cfg", m_cfg)) begin
@@ -110,6 +115,7 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
 
             // Setup Phase
             if (trans == null) begin
+                apb_transaction#(`_APB_AGENT_PARAM_MAP) req;
                 // TODO: Check penable
 
                 trans = apb_transaction#(`_APB_AGENT_PARAM_MAP)::type_id::create("monitor_trans");
@@ -118,6 +124,12 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
                 trans.wstrb = m_vif.pstrb;
                 trans.pprot = m_vif.pprot;
                 trans.wait_states = 0;
+
+                if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
+                    $cast(req, trans.clone());
+                    req.data = m_vif.pwdata;
+                    req_ap.write(req);
+                end
 
                 continue;
             end

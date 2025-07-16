@@ -25,13 +25,18 @@
     parameter int ADDR_WIDTH = 32,  \
     parameter int DATA_WIDTH = 32
 
+// Macro: _APB_AGENT_PARAM_MAP
+// Map the parameters from the parent into a child instance
 `define _APB_AGENT_PARAM_MAP \
     .ADDR_WIDTH(ADDR_WIDTH),      \
     .DATA_WIDTH(DATA_WIDTH)
 
-`define APB_IF_INST(ADDR, DATA, HBURST, HPROT, HMASTER, IF_NAME=APB, CLK_NAME=hclk, RST_NAME=hresetn) \
+// Macro: APB_IF_INST
+// Instantiate the apb_vip_if and set it in the config_db
+`define APB_IF_INST(ADDR, DATA, IF_NAME=APB, CLK_NAME=pclk, RST_NAME=presetn) \
     apb_vip_if #(                            \
-        `_APB_AGENT_PARAM_MAP                \
+        .ADDR_WIDTH(ADDR),                   \
+        .DATA_WIDTH(DATA)                    \
     ) IF_NAME (                              \
         .pclk(CLK_NAME),                     \
         .preset_n(RST_NAME)                  \
@@ -39,7 +44,8 @@
     initial begin                            \
         uvm_config_db#(                      \
             virtual apb_vip_if #(            \
-                `_APB_AGENT_PARAM_MAP        \
+                .ADDR_WIDTH(ADDR),           \
+                .DATA_WIDTH(DATA)            \
             )                                \
         )::set(null, "*", "m_vif", IF_NAME); \
     end

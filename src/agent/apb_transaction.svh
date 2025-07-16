@@ -96,7 +96,7 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
     endfunction : new
 
     // Group: UVM do_* methods
-    ////////////////////////////////////////////////////////////////////////////////////////////////o
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Function: do_print
     virtual function void do_print(uvm_printer printer);
@@ -104,6 +104,7 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
         `uvm_print_enum(apb_write_e, write)
         printer.print_field("addr", addr, $bits(addr));
         printer.print_field("data", data, $bits(data));
+        printer.print_field("pprot", pprot, $bits(pprot));
         `uvm_print_int(wait_states, $size(wait_states))
     endfunction : do_print
 
@@ -118,4 +119,22 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
         `uvm_record_int("wait_states", wait_states, 32)
 
     endfunction : do_record
+
+    // Function: do_copy
+    virtual function void do_copy(uvm_object rhs);
+        apb_transaction#(`_APB_AGENT_PARAM_MAP) _rhs;
+        super.do_copy(rhs);
+
+        if (!$cast(_rhs, rhs))
+            `uvm_fatal(get_type_name(), "Could not cast rhs to ransaction in do_copy")
+
+        rand_type = _rhs.rand_type;
+        write = _rhs.write;
+        addr = _rhs.addr;
+        data = _rhs.data;
+        wstrb = _rhs.wstrb;
+        pprot = _rhs.pprot;
+        wait_states = _rhs.wait_states;
+    endfunction : do_copy
+
 endclass : apb_transaction
