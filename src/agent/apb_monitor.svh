@@ -108,15 +108,21 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
 
             // Idle Phase
             if (!m_vif.psel) begin
-                // TODO: Check no oustanding transactions
-                // TODO: Check penable
+                if (trans != null) begin
+                    `uvm_error(get_type_name(), "psel is low while there is an outstanding transaction")
+                end
+                if (m_vif.penable) begin
+                    `uvm_error(get_type_name(), "penable is high while psel is low")
+                end
                 continue;
             end
 
             // Setup Phase
             if (trans == null) begin
                 apb_transaction#(`_APB_AGENT_PARAM_MAP) req;
-                // TODO: Check penable
+                if (m_vif.penable) begin
+                    `uvm_error(get_type_name(), "penable is high during the access phase")
+                end
 
                 trans = apb_transaction#(`_APB_AGENT_PARAM_MAP)::type_id::create("monitor_trans");
                 trans.write = (m_vif.pwrite) ? APB_WRITE : APB_READ;
@@ -135,7 +141,9 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
             end
 
             // Access Phase
-            // TODO: Check penable
+            if (!m_vif.penable) begin
+                `uvm_error(get_type_name(), "penable is low during the access phase")
+            end
 
             if (m_vif.pready && m_vif.penable) begin
                 if (trans.write == APB_READ) begin
