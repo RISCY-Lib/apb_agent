@@ -30,14 +30,15 @@
 //
 // See Also:
 //  <_APB_AGENT_PARAM_DEFS>
-interface apb_vip_if #(
+interface apb_vip_if
+    import apb_agent_pkg::*;
+#(
     `_APB_AGENT_PARAM_DEFS
 ) (
     input logic preset_n,
     input logic pclk
 );
 
-    import apb_agent_pkg::*;
 
     localparam int _STRB_WIDTH = DATA_WIDTH/8;
 
@@ -59,15 +60,32 @@ interface apb_vip_if #(
     // Signal: penable
     // Enable
     logic                      penable;
+
+    // Signal: pwrite
+    // Write
     apb_write_e                pwrite;
+
+    // Signal: pwdata
+    // Write Data
     logic [    DATA_WIDTH-1:0] pwdata;
+
+    // Signal: pstrb
+    // Write strobe
     logic [   _STRB_WIDTH-1:0] pstrb;
 
     // Group: Completer Signals
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Signal: pready
+    // pready
     logic                  pready;
+
+    // Signal: prdata
+    // Read Data
     logic [DATA_WIDTH-1:0] prdata;
+
+    // Signal: pslverr
+    // Completer Error
     logic                  pslverr;
 
 endinterface : apb_vip_if

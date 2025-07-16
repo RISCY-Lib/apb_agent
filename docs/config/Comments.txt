@@ -28,7 +28,14 @@ Alter Comment Type: Class
       package, packages
 
 
+Alter Comment Type: Module
+
+   SystemVerilog Keywords:
+      interface, interfaces
+
+
 Alter Comment Type: Function
+
    SystemVerilog Keywords:
       task, tasks
 
