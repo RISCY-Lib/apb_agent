@@ -119,7 +119,6 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
 
             // Setup Phase
             if (trans == null) begin
-                apb_transaction#(`_APB_AGENT_PARAM_MAP) req;
                 if (m_vif.penable) begin
                     `uvm_error(get_type_name(), "penable is high during the access phase")
                 end
@@ -132,7 +131,9 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
                 trans.wait_states = 0;
 
                 if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
-                    $cast(req, trans.clone());
+                    apb_transaction#(`_APB_AGENT_PARAM_MAP) req;
+
+                    req = trans.clone();
                     req.data = m_vif.pwdata;
                     req_ap.write(req);
                 end

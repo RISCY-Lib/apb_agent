@@ -61,7 +61,7 @@ class apb_transaction#(`_APB_AGENT_PARAM_DEFS) extends uvm_sequence_item;
     // Poperty: error
     // The Completer Error signal from the transaction.
     // Set by the sequence in APB_REQUESTER_AGENT mode.
-    // set by the agent in AAPB_COMPELTER_AGENT mode.
+    // set by the agent in APB_COMPLETER_AGENT mode.
     rand bit error = 1'b0;
 
     // Property: wait_states
