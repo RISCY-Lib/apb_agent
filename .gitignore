@@ -3,6 +3,8 @@
 
 # Tooling directories
 .dvt/*
+.nvim/
+.vscode/
 
 # Documentation Build Files
 docs/html

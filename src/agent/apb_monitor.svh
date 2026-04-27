@@ -133,7 +133,16 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
                 if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
                     apb_transaction#(`_APB_AGENT_PARAM_MAP) req;
 
-                    req = trans.clone();
+                    if (!$cast(req, trans.clone())) begin
+                        `uvm_fatal(
+                            get_type_name(),
+                            $sformatf(
+                                "Unable to cast transaction (%s) to req (%s)",
+                                trans.get_type_name(),
+                                apb_transaction#(`_APB_AGENT_PARAM_MAP)::type_name
+                            )
+                        )
+                    end
                     req.data = m_vif.pwdata;
                     req_ap.write(req);
                 end
