@@ -99,7 +99,7 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
         apb_transaction #(`_APB_AGENT_PARAM_MAP) trans;
 
         forever begin
-            @(posedge m_vif.pclk);
+            @(m_vif.mon_cb);
 
             if (!m_vif.preset_n) begin
                 trans = null;
@@ -107,11 +107,11 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
             end
 
             // Idle Phase
-            if (!m_vif.psel) begin
+            if (!m_vif.mon_cb.psel) begin
                 if (trans != null) begin
                     `uvm_error(get_type_name(), "psel is low while there is an outstanding transaction")
                 end
-                if (m_vif.penable) begin
+                if (m_vif.mon_cb.penable) begin
                     `uvm_error(get_type_name(), "penable is high while psel is low")
                 end
                 continue;
@@ -119,15 +119,15 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
 
             // Setup Phase
             if (trans == null) begin
-                if (m_vif.penable) begin
+                if (m_vif.mon_cb.penable) begin
                     `uvm_error(get_type_name(), "penable is high during the access phase")
                 end
 
                 trans = apb_transaction#(`_APB_AGENT_PARAM_MAP)::type_id::create("monitor_trans");
-                trans.write = (m_vif.pwrite) ? APB_WRITE : APB_READ;
-                trans.addr = m_vif.paddr;
-                trans.wstrb = m_vif.pstrb;
-                trans.pprot = m_vif.pprot;
+                trans.write = (m_vif.mon_cb.pwrite) ? APB_WRITE : APB_READ;
+                trans.addr = m_vif.mon_cb.paddr;
+                trans.wstrb = m_vif.mon_cb.pstrb;
+                trans.pprot = m_vif.mon_cb.pprot;
                 trans.wait_states = 0;
 
                 if (m_cfg.agent_mode == APB_REQUESTER_AGENT) begin
@@ -143,7 +143,7 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
                             )
                         )
                     end
-                    req.data = m_vif.pwdata;
+                    req.data = m_vif.mon_cb.pwdata;
                     req_ap.write(req);
                 end
 
@@ -151,19 +151,19 @@ class apb_monitor#(`_APB_AGENT_PARAM_DEFS) extends uvm_monitor;
             end
 
             // Access Phase
-            if (!m_vif.penable) begin
+            if (!m_vif.mon_cb.penable) begin
                 `uvm_error(get_type_name(), "penable is low during the access phase")
             end
 
-            if (m_vif.pready && m_vif.penable) begin
+            if (m_vif.mon_cb.pready && m_vif.mon_cb.penable) begin
                 if (trans.write == APB_READ) begin
-                    trans.data = m_vif.prdata;
+                    trans.data = m_vif.mon_cb.prdata;
                 end
                 else begin
-                    trans.data = m_vif.pwdata;
+                    trans.data = m_vif.mon_cb.pwdata;
                 end
 
-                trans.error = m_vif.pslverr;
+                trans.error = m_vif.mon_cb.pslverr;
 
                 ap.write(trans);
                 trans = null;

@@ -88,4 +88,46 @@ interface apb_vip_if
     // Completer Error
     logic                  pslverr;
 
+    // Group: Clocking Blocks
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Clocking Block: drv_req_cb
+    // Drives the requester-side stimulus (used by the driver in APB_COMPLETER_AGENT mode)
+    clocking drv_req_cb @(posedge pclk);
+        default input #1step output #1;
+        output paddr, pprot, psel, penable, pwrite, pwdata, pstrb;
+        input  pready, prdata, pslverr;
+    endclocking : drv_req_cb
+
+    // Clocking Block: drv_comp_cb
+    // Drives the completer-side response (used by the driver in APB_REQUESTER_AGENT mode)
+    clocking drv_comp_cb @(posedge pclk);
+        default input #1step output #1;
+        output pready, prdata, pslverr;
+        input  paddr, pprot, psel, penable, pwrite, pwdata, pstrb;
+    endclocking : drv_comp_cb
+
+    // Clocking Block: mon_cb
+    // Samples every functional signal (used by the monitor)
+    clocking mon_cb @(posedge pclk);
+        default input #1step;
+        input paddr, pprot, psel, penable, pwrite, pwdata, pstrb,
+              pready, prdata, pslverr;
+    endclocking : mon_cb
+
+    // Group: Modports
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Modport: drv_req
+    // Requester-stimulus driver view
+    modport drv_req (clocking drv_req_cb, input pclk, input preset_n);
+
+    // Modport: drv_comp
+    // Completer-response driver view
+    modport drv_comp (clocking drv_comp_cb, input pclk, input preset_n);
+
+    // Modport: mon
+    // Passive monitor view
+    modport mon (clocking mon_cb, input pclk, input preset_n);
+
 endinterface : apb_vip_if

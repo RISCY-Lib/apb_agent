@@ -110,25 +110,25 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
         trans = null;
         phase = APB_SETUP_PHASE;
 
-        m_vif.paddr     = '0;
-        m_vif.pprot     = '0;
-        m_vif.pwdata    = '0;
-        m_vif.pstrb     = '1;
-        m_vif.pwrite    = APB_READ;
+        m_vif.drv_req_cb.paddr     <= '0;
+        m_vif.drv_req_cb.pprot     <= '0;
+        m_vif.drv_req_cb.pwdata    <= '0;
+        m_vif.drv_req_cb.pstrb     <= '1;
+        m_vif.drv_req_cb.pwrite    <= APB_READ;
 
-        m_vif.psel      = 1'b0;
-        m_vif.penable   = 1'b0;
+        m_vif.drv_req_cb.psel      <= 1'b0;
+        m_vif.drv_req_cb.penable   <= 1'b0;
 
         forever begin
-            @(posedge m_vif.pclk);
+            @(m_vif.drv_req_cb);
 
             if (!m_vif.preset_n)
                 continue;
 
             // First check if the previous transaction is done
-            if (m_vif.pready && phase == APB_ACCESS_PHASE && trans != null) begin
+            if (m_vif.drv_req_cb.pready && phase == APB_ACCESS_PHASE && trans != null) begin
                 if (trans.write == APB_READ) begin
-                    trans.data = m_vif.prdata;
+                    trans.data = m_vif.drv_req_cb.prdata;
                 end
 
                 `uvm_info(get_type_name(), "Finished transaction", UVM_HIGH)
@@ -145,29 +145,29 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
 
             // Drive setup-phase signals if applicable
             if (trans != null && phase == APB_SETUP_PHASE) begin
-                m_vif.paddr = trans.addr;
-                m_vif.pprot = trans.pprot;
-                m_vif.pwrite = trans.write;
+                m_vif.drv_req_cb.paddr  <= trans.addr;
+                m_vif.drv_req_cb.pprot  <= trans.pprot;
+                m_vif.drv_req_cb.pwrite <= trans.write;
 
                 if (trans.write == APB_WRITE) begin
-                    m_vif.pwdata = trans.data;
-                    m_vif.pstrb = trans.wstrb;
+                    m_vif.drv_req_cb.pwdata <= trans.data;
+                    m_vif.drv_req_cb.pstrb  <= trans.wstrb;
                 end
             end
 
             // Set psel and penable based on the transaction stage
             if (trans == null) begin
-                m_vif.psel = 1'b0;
-                m_vif.penable = 1'b0;
+                m_vif.drv_req_cb.psel    <= 1'b0;
+                m_vif.drv_req_cb.penable <= 1'b0;
             end
             else if (phase == APB_SETUP_PHASE) begin
-                m_vif.psel = 1'b1;
-                m_vif.penable = 1'b0;
+                m_vif.drv_req_cb.psel    <= 1'b1;
+                m_vif.drv_req_cb.penable <= 1'b0;
                 phase = APB_ACCESS_PHASE;
             end
             else begin
-                m_vif.psel = 1'b1;
-                m_vif.penable = 1'b1;
+                m_vif.drv_req_cb.psel    <= 1'b1;
+                m_vif.drv_req_cb.penable <= 1'b1;
             end
         end
     endtask : completer_run_phase
@@ -179,28 +179,28 @@ class apb_driver#(`_APB_AGENT_PARAM_DEFS) extends uvm_driver#(apb_transaction#(`
         apb_transaction#(`_APB_AGENT_PARAM_MAP) trans;
         int wait_states;
 
-        m_vif.pready = 1'b0;
-        m_vif.prdata = '0;
-        m_vif.pslverr = 1'b0;
+        m_vif.drv_comp_cb.pready  <= 1'b0;
+        m_vif.drv_comp_cb.prdata  <= '0;
+        m_vif.drv_comp_cb.pslverr <= 1'b0;
 
         forever begin
-            m_vif.pready = 1'b0;
+            m_vif.drv_comp_cb.pready <= 1'b0;
 
             // Get the reaction
             seq_item_port.get_next_item(trans);
 
             repeat(trans.wait_states) begin
-                @(posedge m_vif.pclk);
+                @(m_vif.drv_comp_cb);
             end
 
             if (trans.write == APB_READ) begin
-                m_vif.prdata = trans.data;
+                m_vif.drv_comp_cb.prdata <= trans.data;
             end
 
-            m_vif.pready = 1'b1;
-            m_vif.pslverr = trans.error;
+            m_vif.drv_comp_cb.pready  <= 1'b1;
+            m_vif.drv_comp_cb.pslverr <= trans.error;
 
-            @(posedge m_vif.pclk);
+            @(m_vif.drv_comp_cb);
             seq_item_port.item_done();
         end
     endtask : requester_run_phase
